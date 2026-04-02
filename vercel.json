@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/api/analyze",
+      "dest": "/api/analyze.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/static/$1"
+    }
+  ]
+}
