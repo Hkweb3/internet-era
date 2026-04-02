@@ -1,251 +1,194 @@
 import os
-import json
-import hashlib
 import openai
 
-ARCHETYPES = {
-    "main_character": {
-        "name": "Main Character Energy",
-        "icon": "🌟",
-        "desc": "You radiate confidence and purpose. People don't just notice you - they remember you. Your vibe is unapologetically authentic and magnetic.",
-        "colors": ["#FF6B6B", "#FFA07A", "#FFD700"],
-        "aesthetic": "golden hour cinematic"
+ERAS = {
+    "doomscroll_renaissance": {
+        "name": "Doomscrolling Renaissance",
+        "emoji": "\U0001f4dc\U0001f525",
+        "colors": ["#1a0a00", "#ff4500", "#ff8c00"],
+        "gradient": "linear-gradient(135deg, #1a0a00, #ff4500, #ff8c00)",
+        "description": "You are chronically online and thriving in it. You know every drama within minutes. Your FYP knows you better than your therapist.",
+        "tagline": "informed? more like weaponized",
+        "aesthetic": "blue-lit face at 3am reading threads about the downfall of western civilization",
+        "spirit_website": "X (formerly Twitter)",
+        "spirit_animal": "Phoenix eating itself"
     },
-    "dark_academia": {
-        "name": "Dark Academic",
-        "icon": "📚",
-        "desc": "Mysterious, intellectual, and deeply thoughtful. You're the person who reads at 2 AM and has profound conversations in coffee shops.",
-        "colors": ["#2C1810", "#8B6914", "#DEB887"],
-        "aesthetic": "candlelit library at midnight"
+    "delulu_influencer": {
+        "name": "Delulu Influencer Era",
+        "emoji": "\u2728\U0001f4f8",
+        "colors": ["#2a1b38", "#e040fb", "#ff80ab"],
+        "gradient": "linear-gradient(135deg, #2a1b38, #e040fb, #ff80ab)",
+        "description": "You post like you have 10M followers but your most liked post is happy birthday mom. Still maintaining the aesthetic. Still believing in the grind.",
+        "tagline": "fake it till you make it but like actually",
+        "aesthetic": "ring light in a messy room posting like you are in a penthouse",
+        "spirit_website": "TikTok",
+        "spirit_animal": "Peacock in a parking lot"
     },
-    "soft_babygirl": {
-        "name": "Soft & Ethereal",
-        "icon": "🦋",
-        "desc": "Gentle, dreamy, and deeply empathetic. You have a calming presence that makes people feel safe. Your energy is like a warm hug.",
-        "colors": ["#DDA0DD", "#FFB6C1", "#E6E6FA"],
-        "aesthetic": "pastel clouds at sunset"
+    "archive_mode": {
+        "name": "Archive Mode",
+        "emoji": "\U0001f516\U0001f5c3",
+        "colors": ["#0d1b2a", "#1b998b", "#2ec4b6"],
+        "gradient": "linear-gradient(135deg, #0d1b2a, #1b998b, #2ec4b6)",
+        "description": "Your bookmarks folder has 4892 unread tabs. You save articles with the intention of becoming a completely new person. You do not become that person.",
+        "tagline": "collecting information like a dragon hoarding gold",
+        "aesthetic": "127 open tabs with i need to read this written in a note you never opened",
+        "spirit_website": "Pocket / Pinterest",
+        "spirit_animal": "Squirrel with 900 acorns and no winter prep"
     },
-    "chaos_gremlin": {
-        "name": "Chaos Gremlin",
-        "icon": "👾",
-        "desc": "Unpredictable, hilarious, and brilliantly chaotic. You're the friend who turns a normal Tuesday into an unforgettable story.",
-        "colors": ["#00FF00", "#FF1493", "#4B0082"],
-        "aesthetic": "neon signs in a rainstorm"
+    "main_character_podcast": {
+        "name": "Main Character Podcast Era",
+        "emoji": "\U0001f399\ufe0f\U0001f485",
+        "colors": ["#1a1a2e", "#e94560", "#f38181"],
+        "gradient": "linear-gradient(135deg, #1a1a2e, #e94560, #f38181)",
+        "description": "You narrate your life like you are hosting. Group chats get paragraphs. Your Spotify Wrapped is a TED talk waiting to happen. Everything is content.",
+        "tagline": "sorry i missed your text i was recording a voice note to myself",
+        "aesthetic": "talking to your phone camera at the mall like someone is watching",
+        "spirit_website": "Substack / Podcasts",
+        "spirit_animal": "Golden retriever who found a podcast microphone"
     },
-    "golden_retriever": {
-        "name": "Golden Retreiver Energy", 
-        "color_palette": ["#FFD700", "#FFA500", "#FFFACD"],
-        "icon": "🐕",
-        "desc": "Eternally optimistic, endlessly loyal, perpetually excited. You bring joy to every room and make everyone feel like they're your favorite person.",
-        "colors": ["#FFD700", "#FFA500", "#FFFACD"],
-        "aesthetic": "sunflower field in June"
+    "ghost_protocol": {
+        "name": "Ghost Protocol",
+        "emoji": "\U0001f47b\U0001f573",
+        "colors": ["#0a0a0a", "#4a4a6a", "#7a7a9a"],
+        "gradient": "linear-gradient(135deg, #0a0a0a, #4a4a6a, #7a7a9a)",
+        "description": "You are everywhere and nowhere. You read every message but reply to none. You know everything but say nothing. The internet best kept secret.",
+        "tagline": "present in the mind, absent from the group chat",
+        "aesthetic": "staring into the void while the void stares directly at their search history",
+        "spirit_website": "Reddit (lurker account)",
+        "spirit_animal": "Cat. Not even a ghost cat. Just a cat."
     },
-    "villain_arc": {
-        "name": "In Their Villain Era",
-        "icon": "🖤",
-        "desc": "Done with people-pleasing, unapologetically setting boundaries. You radiate 'I've been through the storm and emerged darker, wiser, and stronger'.",
-        "colors": ["#1A1A1A", "#8B0000", "#4B0082"],
-        "aesthetic": "thunderstorm over gothic architecture"
+    "parasocial_peak": {
+        "name": "Parasocial Peak",
+        "emoji": "\U0001f495\U0001f4fa",
+        "colors": ["#2a0033", "#9b59b6", "#f1c40f"],
+        "gradient": "linear-gradient(135deg, #2a0033, #9b59b6, #f1c40f)",
+        "description": "You can name 37 YouTubers birthdays. You have felt emotions about people who do not know you exist. And honestly you would not change a thing.",
+        "tagline": "they feel like friends. they are not your friends. you know this. it does not matter.",
+        "aesthetic": "watching a 3-hour lore video at 2am and feeling personally attacked by the ending",
+        "spirit_website": "YouTube / Twitch",
+        "spirit_animal": "Koala clinging to a cardboard cutout"
     },
-    "cottagecore": {
-        "name": "Cottagecore Soul",
-        "icon": "🌿",
-        "desc": "You want peace, simplicity, and connection to nature. Your vibe is sourdough starters, pressed flowers, and slow mornings with tea.",
-        "colors": ["#8FBC8F", "#F5DEB3", "#DDA0DD"],
-        "aesthetic": "sun-dappled forest meadow"
+    "algorithm_slave": {
+        "name": "Algorithm Slave",
+        "emoji": "\U0001f916\U0001f300",
+        "colors": ["#001a33", "#00b4d8", "#90e0ef"],
+        "gradient": "linear-gradient(135deg, #001a33, #00b4d8, #90e0ef)",
+        "description": "Your FYP controls your life and you have accepted it. You did not choose the scroll life. You got assigned a video about cleaning products and now your bathroom has 47 new items.",
+        "tagline": "i watched a 40-minute tiktok about concrete. i do not even live near concrete.",
+        "aesthetic": "falling down a rabbit hole about mushroom foraging when you set out to check the weather",
+        "spirit_website": "TikTok / Instagram Reels",
+        "spirit_animal": "Moth but the lamp is the algorithm"
     },
-    "corporate_meltdown": {
-        "name": "Corporate Meltdown",
-        "icon": "💼🔥",
-        "desc": "Professionally unhinged. You're the person who sends emails at 3 AM with passive-aggressive perfection. Burnout chic is your aesthetic.",
-        "colors": ["#708090", "#FF6347", "#2F4F4F"],
-        "aesthetic": "fluorescent lighting meets existential crisis"
-    },
-    "y2k_dream": {
-        "name": "Y2K Dream",
-        "icon": "💿",
-        "desc": "Nostalgic, trendy, and living in your own pop music video. Butterfly clips, bedazzled everything, and early 2000s energy in text form.",
-        "colors": ["#FF69B4", "#00CED1", "#FFD700"],
-        "aesthetic": "bedazzled flip phone in a pool"
-    },
-    "main_character_energy": {
-        "name": "Main Character",
-        "icon": "🌟", 
-        "desc": "You radiate confidence and purpose. People don't just notice you - they remember you. Your vibe is unapologetically authentic and magnetic.",
-        "colors": ["#FFD700", "#FFA500", "#FFF8DC"],
-        "aesthetic": "golden hour, wind in hair, slow motion"
-    },
-    "delulu_queen": {
-        "name": "Delulu Queen/King",
-        "icon": "👑",
-        "desc": "Delusionally optimistic and thriving for it. You see signs where there are none and somehow it works out. Your delulu is your superpower.",
-        "colors": ["#FF69B4", "#FFB6C1", "#FFE4B5"],
-        "aesthetic": "pink clouds and glitter"
+    "cottagecore_internet": {
+        "name": "Cottagecore Internet",
+        "emoji": "\U0001f338\U0001f375",
+        "colors": ["#4a2c2a", "#98a8b3", "#d4b483"],
+        "gradient": "linear-gradient(135deg, #4a2c2a, #98a8b3, #d4b483)",
+        "description": "Your internet is Pinterest boards of sourdough, Instagram accounts of cabins, and 15 saved recipes you will never make. You dream of a quiet life but currently live above a gym.",
+        "tagline": "soft life in a hard world",
+        "aesthetic": "curating a digital garden while surrounded by the chaos of modern existence",
+        "spirit_website": "Pinterest / GoodNotes",
+        "spirit_animal": "Capybara in a garden"
     }
 }
 
-AURAS = {
-    "electric_blue": {"name": "Electric Blue", "emoji": "⚡", "desc": "Magnetic energy - you light up any space"},
-    "warm_gold": {"name": "Warm Gold", "emoji": "✨", "desc": "Nurturing warmth - healing energy"},
-    "deep_purple": {"name": "Deep Purple", "emoji": "🔮", "desc": "Mystical depth - mysterious and wise"},
-    "forest_green": {"name": "Forest Green", "emoji": "🌿", "desc": "Grounded growth - steady and evolving"},
-    "sunset_orange": {"name": "Sunset Orange", "emoji": "🌅", "desc": "Creative fire - passionate and artistic"},
-    "icy_white": {"name": "Icy White", "emoji": "❄️", "desc": "Clean precision - sharp mind"},
-    "rose_pink": {"name": "Rose Pink", "emoji": "🌹", "desc": "Loving depth - romantic and empathetic"},
-    "void_black": {"name": "Void Black", "emoji": "🖤", "desc": "Infinite depth - complex and layered"}
+SCORES = {k: 0 for k in ERAS}
+
+TRAIT_LABELS = {
+    "doomscroll_renaissance": "Doomscroller",
+    "delulu_influencer": "Delulu",
+    "archive_mode": "Archivist",
+    "main_character_podcast": "Podcaster",
+    "ghost_protocol": "Ghost",
+    "parasocial_peak": "Parasocial",
+    "algorithm_slave": "Algorithm'd",
+    "cottagecore_internet": "Cottagecore"
 }
 
-SYSTEM_PROMPT = """You are a Vibe Analyzer - an AI that reads someone's text and generates a detailed personality analysis.
-Analyze the writing style, tone, vocabulary, word choices, emoji usage (if any), and overall energy.
+ERA_KEYS_BY_QUESTION = [
+    ["doomscroll_renaissance", "delulu_influencer", "archive_mode", "ghost_protocol"],
+    ["doomscroll_renaissance", "parasocial_peak", "main_character_podcast", "delulu_influencer"],
+    ["algorithm_slave", "doomscroll_renaissance", "delulu_influencer", "ghost_protocol"],
+    ["ghost_protocol", "main_character_podcast", "parasocial_peak", "delulu_influencer"],
+    ["delulu_influencer", "ghost_protocol", "archive_mode", "main_character_podcast"],
+    ["parasocial_peak", "algorithm_slave", "cottagecore_internet", "doomscroll_renaissance"],
+    ["main_character_podcast", "ghost_protocol", "cottagecore_internet", "archive_mode"],
+    ["parasocial_peak", "algorithm_slave", "cottagecore_internet", "doomscroll_renaissance"],
+]
 
-Output ONLY valid JSON matching this exact structure:
-{
-    "archetype": "one_of_the_archetype_keys",
-    "vibe_score": {
-        "authenticity": 0-100,
-        "chaos": 0-100, 
-        "intellect": 0-100,
-        "warmth": 0-100,
-        "intensity": 0-100
-    },
-    "aesthetic": "one poetic phrase describing their aesthetic",
-    "red_flags": ["flag1", "flag2", "flag3"],
-    "green_flags": ["flag1", "flag2", "flag3"],
-    "famous_match": "a celebrity/public figure match",
-    "famous_match_reason": "why they match",
-    "quote": "a quote that perfectly captures their vibe",
-    "energy": "a 2-3 word description of their energy",
-    "aura": "a description of their aura color/quality"
+AI_PROMPTS = [
+    ("roast", "Write a SHORT fun roast (2 sentences max) about someone who got '{era}' as their internet era. Make it feel personal, funny, and slightly mean in a loving way. No generic stuff."),
+    ("horoscope", "Write a SHORT internet horoscope (1-2 sentences) for this person's week ahead. Make it specific to their internet era. Funny, slightly unhinged."),
+    ("advice", "Give one piece of SHORT absurd but relatable advice (1 sentence max) for someone in '{era}' era. Make it sound like a wellness guru who lost it."),
+]
+
+DEFAULTS = {
+    "roast": "Your era tracks. Your screen time report is judging you.",
+    "horoscope": "This week you'll discover a new app that consumes 47 percent of your life. You'll adapt.",
+    "advice": "Close this app. You won't though. That's very on brand for you."
 }
 
-Rules:
-- Be specific and personal, not generic
-- Red/green flags should be funny but accurate
-- Make it feel like a friend who gets them
-- Keep quotes short and punchy
-- Be genuinely insightful about their writing style and personality signals"""
 
-class VibeAnalyzer:
+class InternetEraEngine:
     def __init__(self):
-        api_key=os.env...EY") or os.environ.get("OPENAI_API_KEY")
-        if not api_key:
-            raise RuntimeError("No API key found. Set OPENROUTER_API_KEY or OPENAI_API_KEY")
-        
-        self.client = openai.OpenAI(
-            api_key=***
-            base_url=os.environ.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
-        )
+        key = os.environ.get("OPENROUTER_API_KEY") or os.environ.get("OPENAI_API_KEY") or ""
+        self.client = None
         self.model = os.environ.get("VIBE_MODEL", "openai/gpt-4o-mini")
-    
-    def analyze(self, text: str, name: str) -> dict:
-        """Generate full vibe analysis from text"""
-        
-        # Truncate if too long
-        if len(text) > 5000:
-            text = text[:5000] + "..."
-        
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": f"Analyze this person's vibe: {text}"}
-            ],
-            temperature=0.8,
-            max_tokens=***
-            response_format={"type": "json_object"}
-        )
-        
-        try:
-            raw = json.loads(response.choices[0].message.content)
-            
-            # Get archetype data
-            arch_key = raw.get("archetype", "main_character")
-            archetype_data = self._get_archetype(arch_key)
-            
-            # Determine aura
-            aura_key = self._match_aura(raw.get("aura", ""), archetype_data)
-            aura = AURAS[aura_key]
-            
-            return {
-                "archetype": archetype_data["name"],
-                "archetype_icon": archetype_data["icon"],
-                "archetype_desc": archetype_data["desc"],
-                "vibe_score": raw.get("vibe_score", {
-                    "authenticity": 75, "chaos": 50, 
-                    "intellect": 65, "warmth": 70, "intensity": 60
-                }),
-                "colors": archetype_data["colors"],
-                "aesthetic": raw.get("aesthetic", archetype_data.get("aesthetic", "beautiful chaos")),
-                "red_flags": raw.get("red_flags", ["probably overthinks everything"]),
-                "green_flags": raw.get("green_flags", ["great friend to have"]),
-                "famous_match": raw.get("famous_match", "someone iconic"),
-                "famous_match_reason": raw.get("famous_match_reason", "you share that special something"),
-                "quote": raw.get("quote", "\"the vibe is immaculate\""),
-                "aura": aura["name"],
-                "aura_emoji": aura["emoji"],
-                "energy": raw.get("energy", "undeniably vibey")
-            }
-            
-        except json.JSONDecodeError:
-            return self._fallback_result(name)
-    
-    def _get_archetype(self, key: str) -> dict:
-        """Map archetype key to full archetype data"""
-        # Normalize key
-        key = key.lower().replace(" ", "_").replace("-", "_")
-        
-        for ak, av in ARCHETYPES.items():
-            if ak in key or key in ak:
-                return av
-        
-        return ARCHETYPES["main_character_energy"]
-    
-    def _match_aura(self, aura_desc: str, archetype: dict) -> str:
-        """Map aura description to aura key"""
-        desc = aura_desc.lower()
-        
-        for ak, av in AURAS.items():
-            if av["name"].lower() in desc or ak.lower().replace("_", " ") in desc:
-                return ak
-        
-        # Default based on archetype vibe
-        default_map = {
-            "villain_arc": "void_black",
-            "golden_retriever": "warm_gold", 
-            "chaos_gremlin": "electric_blue",
-            "soft_babygirl": "rose_pink"
-        }
-        
-        for ak in default_map:
-            if ak in archetype.get("name", "").lower():
-                return default_map[ak]
-        
-        return "warm_gold"
-    
-    def _fallback_result(self, name: str) -> dict:
-        """Fallback if AI analysis fails"""
+        if key:
+            self.client = openai.OpenAI(
+                api_key=key,
+                base_url=os.environ.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"),
+            )
+
+    def score_answers(self, answers):
+        scores = dict(SCORES)
+        for qi, ai in enumerate(answers):
+            if qi < len(ERA_KEYS_BY_QUESTION) and ai < 4:
+                era = ERA_KEYS_BY_QUESTION[qi][ai]
+                scores[era] += 1
+        return scores
+
+    def generate_ai_content(self, era_name):
+        results = dict(DEFAULTS)
+        if not self.client:
+            return results
+        for key, prompt in AI_PROMPTS:
+            try:
+                r = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=[{"role": "user", "content": prompt.format(era=era_name)}],
+                    temperature=0.9,
+                    max_tokens=150,
+                )
+                text = r.choices[0].message.content.strip().strip('"').strip("'")
+                if text:
+                    results[key] = text
+            except Exception:
+                pass
+        return results
+
+    def analyze(self, answers):
+        scores = self.score_answers(answers)
+        max_s = max(scores.values()) or 1
+        winner = max(scores, key=scores.get)
+        runner = max((k for k in scores if k != winner), key=lambda k: scores[k])
+        data = ERAS[winner]
+        ai = self.generate_ai_content(data["name"])
         return {
-            "archetype": "Main Character Energy",
-            "archetype_icon": "🌟",
-            "archetype_desc": f"{name}, your vibe is giving main character energy.",
-            "vibe_score": {
-                "authenticity": 85, "chaos": 45,
-                "intellect": 70, "warmth": 80, "intensity": 65
-            },
-            "colors": ["#FFD700", "#FFA500", "#FFF8DC"],
-            "aesthetic": "golden hour energy",
-            "red_flags": [
-                "probably overthinks every text they send",
-                "has 47 browser tabs open at all times"
-            ],
-            "green_flags": [
-                "incredibly self-aware",
-                "makes every group chat better"
-            ],
-            "famous_match": "Zendaya",
-            "famous_match_reason": "effortlessly cool with depth",
-            "quote": "\"the vibe is immaculate\"",
-            "aura": "Warm Gold",
-            "aura_emoji": "✨",
-            "energy": "undeniably vibey"
+            "era_key": winner,
+            "name": data["name"],
+            "emoji": data["emoji"],
+            "colors": data["colors"],
+            "gradient": data["gradient"],
+            "description": data["description"],
+            "tagline": data["tagline"],
+            "aesthetic": data["aesthetic"],
+            "spirit_website": data["spirit_website"],
+            "spirit_animal": data["spirit_animal"],
+            "scores": {TRAIT_LABELS[k]: v for k, v in scores.items()},
+            "runner_up": ERAS[runner],
+            "total_score": sum(scores.values()),
+            "roast": ai["roast"],
+            "horoscope": ai["horoscope"],
+            "advice": ai["advice"],
         }
